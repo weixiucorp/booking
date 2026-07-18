@@ -578,7 +578,7 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
       <span class="ghost">Q</span>
       <div class="card-title"><span class="tick"></span><h2>訂單查詢</h2></div>
       <p style="font-size:13.5px;color:var(--muted);margin-bottom:1.3rem;line-height:1.8">
-        請輸入確認信中的<b style="color:var(--ink)">客戶代碼</b>與<b style="color:var(--ink)">訂單編號</b>，兩者需同時符合才能查詢，以保護您的資料安全。
+        請輸入確認信中的<b style="color:var(--ink)">客戶代碼</b>與<b style="color:var(--ink)">預約編號</b>，兩者需同時符合才能查詢，以保護您的資料安全。
       </p>
       <div class="field-row">
         <div class="field">
@@ -587,9 +587,9 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
           <span class="err-msg" id="err-q-code">請填寫客戶代碼</span>
         </div>
         <div class="field">
-          <label>訂單編號 <span class="req">*</span></label>
-          <input type="text" id="q-id" placeholder="請輸入訂單編號" style="text-transform:uppercase;font-family:var(--mono);letter-spacing:.1em">
-          <span class="err-msg" id="err-q-id">請填寫訂單編號</span>
+          <label>預約編號 <span class="req">*</span></label>
+          <input type="text" id="q-id" placeholder="請輸入預約編號" style="text-transform:uppercase;font-family:var(--mono);letter-spacing:.1em">
+          <span class="err-msg" id="err-q-id">請填寫預約編號</span>
         </div>
       </div>
       <div class="submit-area" style="margin-top:.4rem">
@@ -780,7 +780,7 @@ async function queryOrders(){
       return;
     }
     if(!data.bookings || data.bookings.length===0){
-      box.innerHTML='<div class="query-empty">🔍 查無此訂單<br>請確認客戶代碼與訂單編號是否與確認信中的一致。</div>';
+      box.innerHTML='<div class="query-empty">🔍 查無此預約<br>請確認客戶代碼與預約編號是否與確認信中的一致。</div>';
       return;
     }
 
@@ -788,7 +788,7 @@ async function queryOrders(){
       <div class="result-card">
         <div class="result-head">
           <div>
-            <span class="result-id">訂單編號 : ${esc(b.id)}</span>
+            <span class="result-id">預約編號 : ${esc(b.id)}</span>
             <span class="result-time">　${esc(b.time)}</span>
           </div>
           <span class="status-chip ${statusClass(b.status)}">${esc(normalizeStatus(b.status)||"已建立")}</span>
