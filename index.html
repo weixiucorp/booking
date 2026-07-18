@@ -520,9 +520,15 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
     <div class="card-title"><span class="tick"></span><h2>產品資訊</h2><span class="opt">OPTIONAL 選填</span></div>
     <div class="field-row">
       <div class="field">
+        <label>產品名稱</label>
+        <input type="text" id="prodname" placeholder="例：游標卡尺、雷射測距儀">
+      </div>
+      <div class="field">
         <label>產品品牌</label>
         <input type="text" id="brand" placeholder="例：Mitutoyo、Keyence">
       </div>
+    </div>
+    <div class="field-row full">
       <div class="field">
         <label>產品型號</label>
         <input type="text" id="model" placeholder="例：CD-6&quot; CX">
@@ -649,6 +655,7 @@ async function submitForm(){
     email:   document.getElementById("email").value.trim(),
     address: document.getElementById("address").value.trim(),
     service: selectedService,
+    prodName: document.getElementById("prodname").value.trim(),
     brand:   document.getElementById("brand").value.trim(),
     model:   document.getElementById("model").value.trim(),
     remarks: document.getElementById("remarks").value.trim(),
@@ -789,6 +796,7 @@ async function queryOrders(){
         <dl class="result-body">
           <dt>公司名稱</dt><dd>${esc(b.company)}</dd>
           <dt>服務類型</dt><dd>${esc(b.service)}</dd>
+          ${b.prodName ? "<dt>產品名稱</dt><dd>"+esc(b.prodName)+"</dd>" : ""}
           ${b.brand  ? "<dt>產品品牌</dt><dd>"+esc(b.brand)+"</dd>" : ""}
           ${b.model  ? "<dt>產品型號</dt><dd>"+esc(b.model)+"</dd>" : ""}
           ${b.remarks? "<dt>特殊說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
@@ -807,7 +815,7 @@ async function queryOrders(){
 }
 
 function resetForm(){
-  ["company","contact","phone","email","address","custcode","brand","model","remarks"].forEach(id=>{
+  ["company","contact","phone","email","address","custcode","prodname","brand","model","remarks"].forEach(id=>{
     const el=document.getElementById(id);el.value="";el.classList.remove("invalid");
   });
   document.querySelectorAll(".err-msg").forEach(e=>e.style.display="none");
