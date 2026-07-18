@@ -363,6 +363,14 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
   font-family:var(--mono);font-size:11.5px;color:var(--muted);
   margin-top:2px;letter-spacing:.04em;
 }
+.tl-note{
+  font-size:13px;color:var(--slate);line-height:1.65;
+  margin-top:5px;
+  background:var(--steel-lt);
+  border-left:3px solid var(--blue);
+  border-radius:0 8px 8px 0;
+  padding:7px 12px;
+}
 .query-empty{
   text-align:center;padding:3rem 1rem;color:var(--muted);
   background:var(--card);border:1.5px dashed var(--line-dk);border-radius:14px;
@@ -691,10 +699,15 @@ function renderTimeline(b){
     return '<p style="font-size:13.5px;color:var(--muted);margin-top:4px">此訂單已取消，如有疑問請聯繫 service@weixiu.com.tw</p>';
   }
   const cur = stageIndex(s);
+  const stages = b.stages || [];
   return '<div class="timeline">' + STAGES.map((st,i)=>{
     const cls = i<cur ? "done" : (i===cur ? "done current" : "");
-    const time = (i===0 && b.time) ? '<div class="tl-time">'+esc(b.time)+'</div>' : "";
-    return '<div class="tl-item '+cls+'"><div class="tl-dot"></div><div><div class="tl-label">'+st+'</div>'+time+'</div></div>';
+    const info = stages[i] || {};
+    // 已建立階段若無時間，回退使用預約時間
+    const t = info.time || (i===0 ? b.time : "");
+    const timeHtml = t ? '<div class="tl-time">'+esc(t)+'</div>' : "";
+    const noteHtml = info.note ? '<div class="tl-note">'+esc(info.note)+'</div>' : "";
+    return '<div class="tl-item '+cls+'"><div class="tl-dot"></div><div><div class="tl-label">'+st+'</div>'+timeHtml+noteHtml+'</div></div>';
   }).join("") + '</div>';
 }
 
