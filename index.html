@@ -319,6 +319,50 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
 }
 .result-body dt{color:var(--muted);font-weight:500;font-size:13px;letter-spacing:.06em}
 .result-body dd{margin:0;font-weight:500}
+/* 進度時間軸 */
+.timeline{
+  display:flex;flex-direction:column;
+  margin-top:6px;padding:4px 0 0 4px;
+}
+.tl-item{
+  display:flex;gap:14px;position:relative;
+  padding-bottom:22px;
+}
+.tl-item:last-child{padding-bottom:0}
+.tl-item::before{ /* 連接線 */
+  content:"";position:absolute;left:8px;top:20px;bottom:0;width:2px;
+  background:var(--line-dk);
+}
+.tl-item:last-child::before{display:none}
+.tl-item.done::before{background:var(--blue)}
+.tl-dot{
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  border:2.5px solid var(--line-dk);background:#fff;
+  position:relative;z-index:1;margin-top:1px;
+  transition:all .3s;
+}
+.tl-item.done .tl-dot{
+  background:var(--blue);border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(0,148,217,.18);
+}
+.tl-item.current .tl-dot{
+  background:#fff;border-color:var(--blue);
+  box-shadow:0 0 0 4px rgba(0,148,217,.22);
+}
+.tl-item.current .tl-dot::after{
+  content:"";position:absolute;inset:3px;border-radius:50%;
+  background:var(--blue);
+}
+.tl-label{
+  font-size:14px;font-weight:700;color:var(--muted);
+  letter-spacing:.08em;line-height:1.4;
+}
+.tl-item.done .tl-label,.tl-item.current .tl-label{color:var(--ink)}
+.tl-item.current .tl-label{color:var(--blue-deep)}
+.tl-time{
+  font-family:var(--mono);font-size:11.5px;color:var(--muted);
+  margin-top:2px;letter-spacing:.04em;
+}
 .query-empty{
   text-align:center;padding:3rem 1rem;color:var(--muted);
   background:var(--card);border:1.5px dashed var(--line-dk);border-radius:14px;
@@ -527,7 +571,7 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
 
 <script>
 // ▼▼▼ 請將下方網址替換為您的 Google Apps Script 部署網址 ▼▼▼
-const GAS_URL = "https://https://script.google.com/macros/s/AKfycbyB4ZzbMKL0C8N3tvknuzVCxgsJFL3e5HTy6YruQBBy_omguOc_tc9BDaAEZ4HXIcANEQ/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyB4ZzbMKL0C8N3tvknuzVCxgsJFL3e5HTy6YruQBBy_omguOc_tc9BDaAEZ4HXIcANEQ/exec";
 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 let selectedService = "";
@@ -619,12 +663,39 @@ function switchTab(which){
   document.getElementById("panel-query").classList.toggle("active", which==="query");
 }
 
+const STAGES = ["已建立","已報價","已派工","執行中","待完工","已完成"];
+
+function normalizeStatus(s){
+  s = (s||"").trim();
+  // 相容舊狀態名稱
+  if(s==="待處理") return "已建立";
+  if(s==="處理中") return "執行中";
+  return s;
+}
+
+function stageIndex(s){
+  return STAGES.indexOf(normalizeStatus(s));
+}
+
 function statusClass(s){
-  if(!s) return "s-wait";
-  if(s.indexOf("完成")>-1) return "s-done";
-  if(s.indexOf("處理中")>-1 || s.indexOf("進行")>-1) return "s-doing";
-  if(s.indexOf("取消")>-1) return "s-cancel";
-  return "s-wait";
+  s = normalizeStatus(s);
+  if(s==="已完成") return "s-done";
+  if(s==="已取消") return "s-cancel";
+  if(s==="已建立") return "s-wait";
+  return "s-doing";
+}
+
+function renderTimeline(b){
+  const s = normalizeStatus(b.status);
+  if(s==="已取消"){
+    return '<p style="font-size:13.5px;color:var(--muted);margin-top:4px">此訂單已取消，如有疑問請聯繫 service@weixiu.com.tw</p>';
+  }
+  const cur = stageIndex(s);
+  return '<div class="timeline">' + STAGES.map((st,i)=>{
+    const cls = i<cur ? "done" : (i===cur ? "done current" : "");
+    const time = (i===0 && b.time) ? '<div class="tl-time">'+esc(b.time)+'</div>' : "";
+    return '<div class="tl-item '+cls+'"><div class="tl-dot"></div><div><div class="tl-label">'+st+'</div>'+time+'</div></div>';
+  }).join("") + '</div>';
 }
 
 function esc(t){
@@ -677,7 +748,7 @@ async function queryOrders(){
             <span class="result-id">預約 #${esc(b.id)}</span>
             <span class="result-time">　${esc(b.time)}</span>
           </div>
-          <span class="status-chip ${statusClass(b.status)}">${esc(b.status||"待處理")}</span>
+          <span class="status-chip ${statusClass(b.status)}">${esc(normalizeStatus(b.status)||"已建立")}</span>
         </div>
         <dl class="result-body">
           <dt>公司名稱</dt><dd>${esc(b.company)}</dd>
@@ -686,6 +757,10 @@ async function queryOrders(){
           ${b.model  ? "<dt>產品型號</dt><dd>"+esc(b.model)+"</dd>" : ""}
           ${b.remarks? "<dt>特殊說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
         </dl>
+        <div style="border-top:1px dashed var(--line-dk);padding-top:14px;margin-top:2px">
+          <div style="font-size:12.5px;font-weight:700;color:var(--slate);letter-spacing:.14em;margin-bottom:10px">進度追蹤</div>
+          ${renderTimeline(b)}
+        </div>
       </div>`).join("");
 
   }catch(err){
