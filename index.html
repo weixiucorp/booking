@@ -348,17 +348,39 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
 .tl-item.current .tl-dot{
   background:#fff;border-color:var(--blue);
   box-shadow:0 0 0 4px rgba(0,148,217,.22);
+  animation:pulse 1.8s ease-in-out infinite;
 }
 .tl-item.current .tl-dot::after{
   content:"";position:absolute;inset:3px;border-radius:50%;
   background:var(--blue);
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 4px rgba(0,148,217,.22)}
+  50%{box-shadow:0 0 0 9px rgba(0,148,217,.08)}
+}
+/* 目前階段整塊高亮 */
+.tl-item.current .tl-content{
+  background:linear-gradient(135deg,#e6f4fb 0%,#f0fbe8 100%);
+  border:1.5px solid var(--blue);
+  border-radius:12px;
+  padding:10px 16px 12px;
+  margin:-6px 0 0 -4px;
+  box-shadow:0 3px 12px rgba(0,148,217,.16);
+}
+.tl-badge{
+  display:inline-block;
+  background:var(--blue);color:#fff;
+  font-size:10.5px;font-weight:900;letter-spacing:.16em;
+  padding:3px 10px;border-radius:999px;
+  margin-bottom:5px;
+  vertical-align:middle;
 }
 .tl-label{
   font-size:14px;font-weight:700;color:var(--muted);
   letter-spacing:.08em;line-height:1.4;
 }
 .tl-item.done .tl-label,.tl-item.current .tl-label{color:var(--ink)}
-.tl-item.current .tl-label{color:var(--blue-deep)}
+.tl-item.current .tl-label{color:var(--blue-deep);font-size:16.5px}
 .tl-time{
   font-family:var(--mono);font-size:11.5px;color:var(--muted);
   margin-top:2px;letter-spacing:.04em;
@@ -579,7 +601,7 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
 
 <script>
 // ▼▼▼ 請將下方網址替換為您的 Google Apps Script 部署網址 ▼▼▼
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyB4ZzbMKL0C8N3tvknuzVCxgsJFL3e5HTy6YruQBBy_omguOc_tc9BDaAEZ4HXIcANEQ/exec";
+const GAS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 let selectedService = "";
@@ -707,7 +729,8 @@ function renderTimeline(b){
     const t = info.time || (i===0 ? b.time : "");
     const timeHtml = t ? '<div class="tl-time">'+esc(t)+'</div>' : "";
     const noteHtml = info.note ? '<div class="tl-note">'+esc(info.note)+'</div>' : "";
-    return '<div class="tl-item '+cls+'"><div class="tl-dot"></div><div><div class="tl-label">'+st+'</div>'+timeHtml+noteHtml+'</div></div>';
+    const badge = (i===cur) ? '<span class="tl-badge">▶ 目前進度</span>' : "";
+    return '<div class="tl-item '+cls+'"><div class="tl-dot"></div><div class="tl-content">'+badge+'<div class="tl-label">'+st+'</div>'+timeHtml+noteHtml+'</div></div>';
   }).join("") + '</div>';
 }
 
@@ -758,7 +781,7 @@ async function queryOrders(){
       <div class="result-card">
         <div class="result-head">
           <div>
-            <span class="result-id">預約 #${esc(b.id)}</span>
+            <span class="result-id">訂單編號 : ${esc(b.id)}</span>
             <span class="result-time">　${esc(b.time)}</span>
           </div>
           <span class="status-chip ${statusClass(b.status)}">${esc(normalizeStatus(b.status)||"已建立")}</span>
