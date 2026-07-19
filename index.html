@@ -6,7 +6,7 @@
 <title>客戶預約服務系統｜唯修科技 WEIXIU MAINTAIN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --blue:#0094D9;
@@ -394,36 +394,58 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
   border-radius:0 8px 8px 0;
   padding:7px 12px;
 }
-/* 完成印章 */
+/* 結案印章（破邊做舊風） */
 .stamp{
   position:absolute;
-  top:52px;right:34px;
-  width:118px;height:118px;
+  top:44px;right:26px;
+  width:132px;height:132px;
   display:flex;align-items:center;justify-content:center;
-  border:4px solid #d0342c;
+  border:8px solid #b52a22;
   border-radius:10px;
-  transform:rotate(-14deg);
-  color:#d0342c;
-  font-size:34px;font-weight:900;letter-spacing:.18em;
-  text-indent:.18em; /* 平衡字距 */
-  opacity:.82;
+  transform:rotate(-13deg);
+  color:#b52a22;
+  font-family:"Noto Serif TC",serif;
+  font-size:60px;font-weight:900;
+  letter-spacing:0;line-height:1;
+  opacity:.9;
   pointer-events:none;
   z-index:2;
-  /* 印泥質感：內外雙框 + 些微模糊邊 */
-  box-shadow:inset 0 0 0 2px rgba(208,52,44,.35);
-  text-shadow:0 0 1px rgba(208,52,44,.5);
+  box-shadow:inset 0 0 0 2px rgba(181,42,34,.35);
+  text-shadow:
+    .5px .5px 0 rgba(181,42,34,.4),
+    -.5px -.5px 0 rgba(181,42,34,.3);
   animation:stampIn .45s cubic-bezier(.2,1.6,.4,1) both;
-  /* 斑駁印泥效果 */
-  -webkit-mask-image:radial-gradient(circle at 30% 40%, black 60%, rgba(0,0,0,.82) 78%, rgba(0,0,0,.65) 100%);
-          mask-image:radial-gradient(circle at 30% 40%, black 60%, rgba(0,0,0,.82) 78%, rgba(0,0,0,.65) 100%);
+  /* 強烈破邊做舊：多處缺角 + 斑駁印泥不均 */
+  -webkit-mask-image:
+    radial-gradient(circle at 12% 16%, transparent 7px, black 8px),
+    radial-gradient(circle at 90% 64%, transparent 8px, black 9px),
+    radial-gradient(circle at 58% 97%, transparent 7px, black 8px),
+    radial-gradient(circle at 97% 12%, transparent 6px, black 7px),
+    radial-gradient(circle at 4% 78%, transparent 6px, black 7px),
+    radial-gradient(circle at 38% 2%, transparent 5px, black 6px),
+    radial-gradient(circle at 74% 30%, rgba(0,0,0,.25) 3px, black 9px),
+    radial-gradient(circle at 22% 58%, rgba(0,0,0,.3) 4px, black 10px),
+    radial-gradient(ellipse at 34% 38%, black 42%, rgba(0,0,0,.82) 62%, rgba(0,0,0,.5) 85%, rgba(0,0,0,.28) 100%);
+  -webkit-mask-composite:source-in;
+          mask-image:
+    radial-gradient(circle at 12% 16%, transparent 7px, black 8px),
+    radial-gradient(circle at 90% 64%, transparent 8px, black 9px),
+    radial-gradient(circle at 58% 97%, transparent 7px, black 8px),
+    radial-gradient(circle at 97% 12%, transparent 6px, black 7px),
+    radial-gradient(circle at 4% 78%, transparent 6px, black 7px),
+    radial-gradient(circle at 38% 2%, transparent 5px, black 6px),
+    radial-gradient(circle at 74% 30%, rgba(0,0,0,.25) 3px, black 9px),
+    radial-gradient(circle at 22% 58%, rgba(0,0,0,.3) 4px, black 10px),
+    radial-gradient(ellipse at 34% 38%, black 42%, rgba(0,0,0,.82) 62%, rgba(0,0,0,.5) 85%, rgba(0,0,0,.28) 100%);
+          mask-composite:intersect;
 }
 @keyframes stampIn{
-  0%{transform:rotate(-14deg) scale(1.9);opacity:0}
-  60%{opacity:.9}
-  100%{transform:rotate(-14deg) scale(1);opacity:.82}
+  0%{transform:rotate(-13deg) scale(2);opacity:0}
+  55%{opacity:.95}
+  100%{transform:rotate(-13deg) scale(1);opacity:.9}
 }
 @media(max-width:600px){
-  .stamp{width:92px;height:92px;font-size:26px;top:46px;right:16px;border-width:3px}
+  .stamp{width:100px;height:100px;font-size:45px;top:44px;right:12px;border-width:6px}
 }
 .query-empty{
   text-align:center;padding:3rem 1rem;color:var(--muted);
