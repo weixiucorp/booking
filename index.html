@@ -399,15 +399,27 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
   position:absolute;
   top:56px;right:22px;
   width:196px;height:112px;
-  transform:rotate(-11deg);
+  transform:rotate(-8deg);
   pointer-events:none;z-index:2;
-  animation:stampIn .45s cubic-bezier(.2,1.6,.4,1) both;
+  animation:stampIn .7s cubic-bezier(.25,1.2,.35,1) both;
 }
 .stamp svg{width:100%;height:100%;display:block}
+.stamp::after{ /* 蓋章衝擊波 */
+  content:"";position:absolute;inset:-10px;
+  border:3px solid rgba(181,42,34,.55);
+  border-radius:16px;
+  opacity:0;
+  animation:shock .5s ease-out .42s;
+}
+@keyframes shock{
+  0%{opacity:.7;transform:scale(.9)}
+  100%{opacity:0;transform:scale(1.35)}
+}
 @keyframes stampIn{
-  0%{transform:rotate(-11deg) scale(1.9);opacity:0}
-  55%{opacity:1}
-  100%{transform:rotate(-11deg) scale(1);opacity:1}
+  0%{transform:rotate(-8deg) scale(3.2);opacity:0;filter:blur(2px)}
+  62%{transform:rotate(-8deg) scale(.92);opacity:1;filter:blur(0)}
+  78%{transform:rotate(-8deg) scale(1.06)}
+  100%{transform:rotate(-8deg) scale(1);opacity:1}
 }
 @media(max-width:600px){
   .stamp{width:150px;height:86px;top:52px;right:10px}
@@ -792,6 +804,13 @@ function esc(t){
   const d=document.createElement("div");d.textContent=t==null?"":String(t);return d.innerHTML;
 }
 
+function maskName(n){
+  n=(n||"").trim();
+  if(n.length<=1) return n;
+  if(n.length===2) return n[0]+"＊";
+  return n[0]+"＊".repeat(n.length-2)+n[n.length-1];
+}
+
 function markInvalid(el,errId,bad){
   el.classList.toggle("invalid",bad);
   document.getElementById(errId).style.display = bad ? "block" : "none";
@@ -843,6 +862,12 @@ async function queryOrders(){
         </div>
         <dl class="result-body">
           <dt>公司名稱</dt><dd>${esc(b.company)}</dd>
+          ${b.contact ? "<dt>聯繫人</dt><dd>"+esc(maskName(b.contact))+"</dd>" : ""}
+          ${b.phone ? '<dt>聯繫電話</dt><dd><a href="tel:'+esc(b.phone)+'" style="color:var(--blue-deep);text-decoration:none">'+esc(b.phone)+'</a></dd>' : ""}
+          ${b.email ? '<dt>電子郵件</dt><dd><a href="mailto:'+esc(b.email)+'" style="color:var(--blue-deep);text-decoration:none">'+esc(b.email)+'</a></dd>' : ""}
+        </dl>
+        <div style="border-top:1px dashed var(--line-dk);margin:2px 0"></div>
+        <dl class="result-body">
           <dt>服務類型</dt><dd>${esc(b.service)}</dd>
           ${b.prodName ? "<dt>產品名稱</dt><dd>"+esc(b.prodName)+"</dd>" : ""}
           ${b.brand  ? "<dt>產品品牌</dt><dd>"+esc(b.brand)+"</dd>" : ""}
