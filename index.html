@@ -394,58 +394,23 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
   border-radius:0 8px 8px 0;
   padding:7px 12px;
 }
-/* 結案印章（破邊做舊風） */
+/* 結案印章（橫式・SVG 自然做舊） */
 .stamp{
   position:absolute;
-  top:44px;right:26px;
-  width:132px;height:132px;
-  display:flex;align-items:center;justify-content:center;
-  border:8px solid #b52a22;
-  border-radius:10px;
-  transform:rotate(-13deg);
-  color:#b52a22;
-  font-family:"Noto Serif TC",serif;
-  font-size:60px;font-weight:900;
-  letter-spacing:0;line-height:1;
-  opacity:.9;
-  pointer-events:none;
-  z-index:2;
-  box-shadow:inset 0 0 0 2px rgba(181,42,34,.35);
-  text-shadow:
-    .5px .5px 0 rgba(181,42,34,.4),
-    -.5px -.5px 0 rgba(181,42,34,.3);
+  top:56px;right:22px;
+  width:196px;height:112px;
+  transform:rotate(-11deg);
+  pointer-events:none;z-index:2;
   animation:stampIn .45s cubic-bezier(.2,1.6,.4,1) both;
-  /* 強烈破邊做舊：多處缺角 + 斑駁印泥不均 */
-  -webkit-mask-image:
-    radial-gradient(circle at 12% 16%, transparent 7px, black 8px),
-    radial-gradient(circle at 90% 64%, transparent 8px, black 9px),
-    radial-gradient(circle at 58% 97%, transparent 7px, black 8px),
-    radial-gradient(circle at 97% 12%, transparent 6px, black 7px),
-    radial-gradient(circle at 4% 78%, transparent 6px, black 7px),
-    radial-gradient(circle at 38% 2%, transparent 5px, black 6px),
-    radial-gradient(circle at 74% 30%, rgba(0,0,0,.25) 3px, black 9px),
-    radial-gradient(circle at 22% 58%, rgba(0,0,0,.3) 4px, black 10px),
-    radial-gradient(ellipse at 34% 38%, black 42%, rgba(0,0,0,.82) 62%, rgba(0,0,0,.5) 85%, rgba(0,0,0,.28) 100%);
-  -webkit-mask-composite:source-in;
-          mask-image:
-    radial-gradient(circle at 12% 16%, transparent 7px, black 8px),
-    radial-gradient(circle at 90% 64%, transparent 8px, black 9px),
-    radial-gradient(circle at 58% 97%, transparent 7px, black 8px),
-    radial-gradient(circle at 97% 12%, transparent 6px, black 7px),
-    radial-gradient(circle at 4% 78%, transparent 6px, black 7px),
-    radial-gradient(circle at 38% 2%, transparent 5px, black 6px),
-    radial-gradient(circle at 74% 30%, rgba(0,0,0,.25) 3px, black 9px),
-    radial-gradient(circle at 22% 58%, rgba(0,0,0,.3) 4px, black 10px),
-    radial-gradient(ellipse at 34% 38%, black 42%, rgba(0,0,0,.82) 62%, rgba(0,0,0,.5) 85%, rgba(0,0,0,.28) 100%);
-          mask-composite:intersect;
 }
+.stamp svg{width:100%;height:100%;display:block}
 @keyframes stampIn{
-  0%{transform:rotate(-13deg) scale(2);opacity:0}
-  55%{opacity:.95}
-  100%{transform:rotate(-13deg) scale(1);opacity:.9}
+  0%{transform:rotate(-11deg) scale(1.9);opacity:0}
+  55%{opacity:1}
+  100%{transform:rotate(-11deg) scale(1);opacity:1}
 }
 @media(max-width:600px){
-  .stamp{width:100px;height:100px;font-size:45px;top:44px;right:12px;border-width:6px}
+  .stamp{width:150px;height:86px;top:52px;right:10px}
 }
 .query-empty{
   text-align:center;padding:3rem 1rem;color:var(--muted);
@@ -756,6 +721,34 @@ function switchTab(which){
 
 const STAGES = ["已建立","已報價","已派工","執行中","待完工","已完成"];
 
+// 結案印章（SVG：噪點做舊＋橫式雙框）
+const STAMP_SVG = `<div class="stamp">
+<svg viewBox="0 0 196 112" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="stamp-rough" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="4" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5"/>
+    </filter>
+    <mask id="stamp-mottle">
+      <rect width="196" height="112" fill="#fff"/>
+      <rect width="196" height="112" filter="url(#stamp-grain)" opacity="0.5"/>
+    </mask>
+    <filter id="stamp-grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="12"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.9 0.9 0.9 0 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g filter="url(#stamp-rough)" mask="url(#stamp-mottle)" fill="none" stroke="#b52a22">
+    <rect x="7" y="7" width="182" height="98" rx="9" stroke-width="8"/>
+    <rect x="18" y="18" width="160" height="76" rx="5" stroke-width="1.8" opacity=".55"/>
+    <text x="101" y="78" text-anchor="middle"
+          font-family="'Noto Serif TC',serif" font-weight="900" font-size="62"
+          fill="#b52a22" stroke="none" letter-spacing="6">結案</text>
+  </g>
+</svg>
+</div>`;
+
 function normalizeStatus(s){
   s = (s||"").trim();
   // 相容舊狀態名稱
@@ -840,7 +833,7 @@ async function queryOrders(){
 
     box.innerHTML=data.bookings.map(b=>`
       <div class="result-card">
-        ${normalizeStatus(b.status)==="已完成" ? '<div class="stamp">結案</div>' : ""}
+        ${normalizeStatus(b.status)==="已完成" ? STAMP_SVG : ""}
         <div class="result-head">
           <div>
             <span class="result-id">預約編號 : ${esc(b.id)}</span>
