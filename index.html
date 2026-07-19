@@ -263,6 +263,34 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
 }
 #err-service{display:none;font-size:12px;color:var(--danger);margin-top:10px;font-weight:500}
 
+/* ═══════════ 附件上傳 ═══════════ */
+.upload-zone{
+  border:2px dashed var(--line-dk);
+  border-radius:12px;
+  padding:1.6rem 1rem;
+  text-align:center;cursor:pointer;
+  background:#fbfcfd;
+  transition:all .18s;
+}
+.upload-zone:hover{border-color:var(--blue);background:var(--steel-lt, #e6f4fb)}
+.upload-zone .up-icon{font-size:28px;display:block;margin-bottom:6px}
+.upload-zone .up-main{font-size:14px;font-weight:700;color:var(--slate)}
+.upload-zone .up-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px;letter-spacing:.05em}
+.file-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.file-item{
+  display:flex;align-items:center;gap:10px;
+  background:#fff;border:1px solid var(--line-dk);border-radius:9px;
+  padding:9px 13px;font-size:13.5px;
+}
+.file-item .fi-icon{font-size:17px}
+.file-item .fi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.file-item .fi-size{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.file-item .fi-del{
+  border:none;background:none;cursor:pointer;
+  color:var(--danger);font-size:16px;font-weight:700;padding:2px 6px;
+}
+#err-files{display:none;font-size:12px;color:var(--danger);margin-top:8px;font-weight:500}
+
 /* ═══════════ BUTTONS ═══════════ */
 .submit-area{display:flex;justify-content:flex-end;gap:12px;margin-top:.9rem}
 .btn-reset{
@@ -600,6 +628,22 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
     </div>
   </div>
 
+  <!-- 05 附件上傳 -->
+  <div class="card">
+    <span class="ghost">05</span>
+    <div class="card-title"><span class="tick"></span><h2>附件上傳</h2><span class="opt">OPTIONAL 選填</span></div>
+    <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+      <span class="up-icon">📎</span>
+      <span class="up-main">點擊選擇照片或檔案</span>
+      <div class="up-sub">最多 3 個檔案・每個 5MB 以內・支援圖片 / PDF / Word / Excel</div>
+    </div>
+    <input type="file" id="file-input" multiple
+           accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+           style="display:none" onchange="addFiles(this.files)">
+    <div class="file-list" id="file-list"></div>
+    <span id="err-files"></span>
+  </div>
+
   <div class="submit-area">
     <button type="button" class="btn-reset" onclick="resetForm()">清除重填</button>
     <button type="button" class="btn-submit" id="btn-submit" onclick="submitForm()">
@@ -666,6 +710,64 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbyB4ZzbMKL0C8N3tvknuzVC
 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 let selectedService = "";
+let selectedFiles = [];   // {file, name, size}
+const MAX_FILES = 3, MAX_SIZE = 5 * 1024 * 1024;
+
+function addFiles(fileList){
+  const err = document.getElementById("err-files");
+  err.style.display = "none";
+  for (const f of fileList){
+    if (selectedFiles.length >= MAX_FILES){
+      err.textContent = "最多只能上傳 " + MAX_FILES + " 個檔案";
+      err.style.display = "block";
+      break;
+    }
+    if (f.size > MAX_SIZE){
+      err.textContent = "「" + f.name + "」超過 5MB，請壓縮後再上傳";
+      err.style.display = "block";
+      continue;
+    }
+    selectedFiles.push(f);
+  }
+  document.getElementById("file-input").value = "";
+  renderFileList();
+}
+
+function removeFile(i){
+  selectedFiles.splice(i, 1);
+  renderFileList();
+}
+
+function fileIcon(name){
+  const ext = name.split(".").pop().toLowerCase();
+  if (["jpg","jpeg","png","gif","webp","heic"].includes(ext)) return "🖼️";
+  if (ext === "pdf") return "📄";
+  if (["doc","docx"].includes(ext)) return "📝";
+  if (["xls","xlsx"].includes(ext)) return "📊";
+  return "📎";
+}
+
+function fmtSize(b){
+  return b > 1024*1024 ? (b/1024/1024).toFixed(1)+" MB" : Math.round(b/1024)+" KB";
+}
+
+function renderFileList(){
+  document.getElementById("file-list").innerHTML = selectedFiles.map((f,i)=>
+    '<div class="file-item"><span class="fi-icon">'+fileIcon(f.name)+'</span>'+
+    '<span class="fi-name">'+esc(f.name)+'</span>'+
+    '<span class="fi-size">'+fmtSize(f.size)+'</span>'+
+    '<button type="button" class="fi-del" onclick="removeFile('+i+')" title="移除">✕</button></div>'
+  ).join("");
+}
+
+function readFileB64(f){
+  return new Promise((res, rej)=>{
+    const r = new FileReader();
+    r.onload = () => res({ name: f.name, mimeType: f.type, data: r.result.split(",")[1] });
+    r.onerror = () => rej(new Error("讀取失敗: " + f.name));
+    r.readAsDataURL(f);
+  });
+}
 
 function selectService(btn){
   document.querySelectorAll(".service-btn").forEach(b=>b.classList.remove("selected"));
@@ -716,6 +818,17 @@ async function submitForm(){
     remarks: document.getElementById("remarks").value.trim(),
     custCode: document.getElementById("custcode").value.trim().toUpperCase(),
   };
+
+  // 讀取附件為 base64
+  if (selectedFiles.length > 0){
+    try{
+      payload.files = await Promise.all(selectedFiles.map(readFileB64));
+    }catch(e){
+      document.getElementById("err-files").textContent = "附件讀取失敗，請重新選擇檔案";
+      document.getElementById("err-files").style.display = "block";
+      return;
+    }
+  }
 
   const btn=document.getElementById("btn-submit"),
         spinner=document.getElementById("spinner"),
@@ -919,6 +1032,9 @@ function resetForm(){
   document.getElementById("err-service").style.display="none";
   document.querySelectorAll(".service-btn").forEach(b=>b.classList.remove("selected"));
   selectedService="";
+  selectedFiles=[];
+  renderFileList();
+  document.getElementById("err-files").style.display="none";
   ["step-1","step-2","step-3"].forEach(id=>document.getElementById(id).classList.remove("done"));
   document.getElementById("banner-success").style.display="none";
   document.getElementById("banner-error").style.display="none";
