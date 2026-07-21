@@ -545,8 +545,8 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
   .stamp{width:150px;height:86px;top:52px;right:10px}
 }
 /* 查詢結果設備照片 */
-.cust-grid{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start}
-@media(max-width:560px){.cust-grid{grid-template-columns:1fr}}
+.svc-grid{display:grid;grid-template-columns:1fr 160px;gap:16px;align-items:start}
+@media(max-width:560px){.svc-grid{grid-template-columns:1fr}}
 .cust-photo-main{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:11px;
 border:1px solid var(--line-dk);cursor:zoom-in;background:#eef2f5;display:block;
 box-shadow:0 2px 8px rgba(16,29,38,.1)}
@@ -1093,29 +1093,29 @@ async function queryOrders(){
           </div>
           <span class="status-chip ${statusClass(b.status)}">${esc(normalizeStatus(b.status)||"已建立")}</span>
         </div>
-        <div class="cust-grid" data-photos='${JSON.stringify(b.photos||[])}'>
-          ${(b.photos&&b.photos.length)
-            ? '<div><img class="cust-photo-main" data-cur="0" src="'+qThumb(b.photos[0])+'" alt="設備照片" onclick="qOpenPhoto(this)">'
-              +(b.photos.length>1
-                ? '<div class="cust-thumbs">'+b.photos.map((id,i)=>'<img src="'+qThumb(id,100)+'" class="'+(i===0?"on":"")+'" onclick="qSwitchPhoto(this,'+i+')">').join("")+'</div>'
-                : "")
-              +'</div>'
-            : ""}
-        <dl class="result-body" style="${(b.photos&&b.photos.length)?'':'grid-column:1 / -1'}">
+        <dl class="result-body">
           <dt>公司名稱</dt><dd>${esc(b.company)}</dd>
           ${b.contact ? "<dt>聯繫人</dt><dd>"+esc(maskName(b.contact))+"</dd>" : ""}
           ${b.phone ? '<dt>聯繫電話</dt><dd><a href="tel:'+esc(b.phone)+'" style="color:var(--blue-deep);text-decoration:none">'+esc(b.phone)+'</a></dd>' : ""}
           ${b.email ? '<dt>電子郵件</dt><dd><a href="mailto:'+esc(b.email)+'" style="color:var(--blue-deep);text-decoration:none">'+esc(b.email)+'</a></dd>' : ""}
         </dl>
-        </div>
         <div style="border-top:1px dashed var(--line-dk);margin:2px 0"></div>
-        <dl class="result-body">
+        <div class="svc-grid" data-photos='${JSON.stringify(b.photos||[])}'>
+        <dl class="result-body" style="${(b.photos&&b.photos.length)?'':'grid-column:1 / -1'}">
           <dt>服務類型</dt><dd>${esc(b.service)}</dd>
           ${b.prodName ? "<dt>產品名稱</dt><dd>"+esc(b.prodName)+"</dd>" : ""}
           ${b.brand  ? "<dt>產品品牌</dt><dd>"+esc(b.brand)+"</dd>" : ""}
           ${b.model  ? "<dt>產品型號</dt><dd>"+esc(b.model)+"</dd>" : ""}
           ${b.remarks? "<dt>特殊說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
         </dl>
+          ${(b.photos&&b.photos.length)
+            ? '<div><img class="cust-photo-main" data-cur="0" src="'+qThumb(b.photos[0])+'" alt="產品照片" onclick="qOpenPhoto(this)">'
+              +(b.photos.length>1
+                ? '<div class="cust-thumbs">'+b.photos.map((id,i)=>'<img src="'+qThumb(id,100)+'" class="'+(i===0?"on":"")+'" onclick="qSwitchPhoto(this,'+i+')">').join("")+'</div>'
+                : "")
+              +'</div>'
+            : ""}
+        </div>
         <div style="border-top:1px dashed var(--line-dk);padding-top:14px;margin-top:2px">
           <div style="font-size:12.5px;font-weight:700;color:var(--slate);letter-spacing:.14em;margin-bottom:10px">進度追蹤</div>
           ${renderTimeline(b)}
