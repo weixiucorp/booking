@@ -410,10 +410,13 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
   font-size:12.5px;font-weight:900;padding:5px 16px;border-radius:999px;
   letter-spacing:.1em;
 }
-.status-chip.s-wait{background:#fef4e2;color:#b07818;border:1.5px solid #f0d9a8}
-.status-chip.s-doing{background:#e6f4fb;color:var(--blue-deep);border:1.5px solid #a8d9f0}
-.status-chip.s-done{background:#eef8f1;color:var(--ok);border:1.5px solid #9fd4b4}
-.status-chip.s-cancel{background:#f4f4f4;color:#888;border:1.5px solid #ddd}
+.status-chip.st-已建立{background:#fef4e2;color:#b07818;border:1.5px solid #f0d9a8}
+.status-chip.st-已報價{background:#eef1ff;color:#4c5bd4;border:1.5px solid #c3caf5}
+.status-chip.st-已派工{background:#f3ecff;color:#7c3aed;border:1.5px solid #ddc9f7}
+.status-chip.st-執行中{background:#e6f4fb;color:var(--blue-deep);border:1.5px solid #a8d9f0}
+.status-chip.st-待完工{background:#fff3e0;color:#e07b00;border:1.5px solid #f5cf95}
+.status-chip.st-已完成{background:#eef8f1;color:var(--ok);border:1.5px solid #9fd4b4}
+.status-chip.st-已取消{background:#f4f4f4;color:#888;border:1.5px solid #ddd}
 .result-body{
   display:grid;grid-template-columns:auto 1fr;gap:7px 20px;
   font-size:14px;color:var(--ink);
@@ -979,10 +982,8 @@ function stageIndex(s){
 
 function statusClass(s){
   s = normalizeStatus(s);
-  if(s==="已完成") return "s-done";
-  if(s==="已取消") return "s-cancel";
-  if(s==="已建立") return "s-wait";
-  return "s-doing";
+  const known = ["已建立","已報價","已派工","執行中","待完工","已完成","已取消"];
+  return "st-" + (known.includes(s) ? s : "已建立");
 }
 
 function renderTimeline(b){
