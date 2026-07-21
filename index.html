@@ -544,6 +544,17 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
 @media(max-width:600px){
   .stamp{width:150px;height:86px;top:52px;right:10px}
 }
+/* 查詢結果設備照片 */
+.cust-grid{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start}
+@media(max-width:560px){.cust-grid{grid-template-columns:1fr}}
+.cust-photo-main{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:11px;
+border:1px solid var(--line-dk);cursor:zoom-in;background:#eef2f5;display:block;
+box-shadow:0 2px 8px rgba(16,29,38,.1)}
+@media(max-width:560px){.cust-photo-main{max-width:220px;aspect-ratio:4/3}}
+.cust-thumbs{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.cust-thumbs img{width:34px;height:34px;object-fit:cover;border-radius:6px;
+border:2px solid var(--line-dk);cursor:pointer;opacity:.65}
+.cust-thumbs img.on{border-color:var(--blue);opacity:1}
 .query-empty{
   text-align:center;padding:3rem 1rem;color:var(--muted);
   background:var(--card);border:1.5px dashed var(--line-dk);border-radius:14px;
@@ -1009,6 +1020,23 @@ function esc(t){
   const d=document.createElement("div");d.textContent=t==null?"":String(t);return d.innerHTML;
 }
 
+function qThumb(id,w){return "https://drive.google.com/thumbnail?id="+id+"&sz=w"+(w||600)}
+function qView(id){return "https://drive.google.com/file/d/"+id+"/view"}
+function qOpenPhoto(img){
+  const card=img.closest(".cust-grid");
+  const ids=JSON.parse(card.dataset.photos);
+  const i=parseInt(img.dataset.cur||"0",10);
+  window.open(qView(ids[i]),"_blank");
+}
+function qSwitchPhoto(thumb,i){
+  const card=thumb.closest(".cust-grid");
+  const ids=JSON.parse(card.dataset.photos);
+  const main=card.querySelector(".cust-photo-main");
+  main.src=qThumb(ids[i]);
+  main.dataset.cur=i;
+  card.querySelectorAll(".cust-thumbs img").forEach((el,j)=>el.classList.toggle("on",j===i));
+}
+
 function maskName(n){
   n=(n||"").trim();
   if(n.length<=1) return n;
@@ -1065,12 +1093,21 @@ async function queryOrders(){
           </div>
           <span class="status-chip ${statusClass(b.status)}">${esc(normalizeStatus(b.status)||"已建立")}</span>
         </div>
-        <dl class="result-body">
+        <div class="cust-grid" data-photos='${JSON.stringify(b.photos||[])}'>
+          ${(b.photos&&b.photos.length)
+            ? '<div><img class="cust-photo-main" data-cur="0" src="'+qThumb(b.photos[0])+'" alt="設備照片" onclick="qOpenPhoto(this)">'
+              +(b.photos.length>1
+                ? '<div class="cust-thumbs">'+b.photos.map((id,i)=>'<img src="'+qThumb(id,100)+'" class="'+(i===0?"on":"")+'" onclick="qSwitchPhoto(this,'+i+')">').join("")+'</div>'
+                : "")
+              +'</div>'
+            : ""}
+        <dl class="result-body" style="${(b.photos&&b.photos.length)?'':'grid-column:1 / -1'}">
           <dt>公司名稱</dt><dd>${esc(b.company)}</dd>
           ${b.contact ? "<dt>聯繫人</dt><dd>"+esc(maskName(b.contact))+"</dd>" : ""}
           ${b.phone ? '<dt>聯繫電話</dt><dd><a href="tel:'+esc(b.phone)+'" style="color:var(--blue-deep);text-decoration:none">'+esc(b.phone)+'</a></dd>' : ""}
           ${b.email ? '<dt>電子郵件</dt><dd><a href="mailto:'+esc(b.email)+'" style="color:var(--blue-deep);text-decoration:none">'+esc(b.email)+'</a></dd>' : ""}
         </dl>
+        </div>
         <div style="border-top:1px dashed var(--line-dk);margin:2px 0"></div>
         <dl class="result-body">
           <dt>服務類型</dt><dd>${esc(b.service)}</dd>
