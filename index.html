@@ -410,7 +410,7 @@ textarea{resize:vertical;min-height:104px;line-height:1.7}
   font-size:12.5px;font-weight:900;padding:5px 16px;border-radius:999px;
   letter-spacing:.1em;
 }
-.status-chip.st-已建立{background:#fef4e2;color:#b07818;border:1.5px solid #f0d9a8}
+.status-chip.st-已立案{background:#fef4e2;color:#b07818;border:1.5px solid #f0d9a8}
 .status-chip.st-已報價{background:#eef1ff;color:#4c5bd4;border:1.5px solid #c3caf5}
 .status-chip.st-已派工{background:#f3ecff;color:#7c3aed;border:1.5px solid #ddc9f7}
 .status-chip.st-執行中{background:#e6f4fb;color:var(--blue-deep);border:1.5px solid #a8d9f0}
@@ -949,7 +949,7 @@ function switchTab(which){
   document.getElementById("panel-query").classList.toggle("active", which==="query");
 }
 
-const STAGES = ["已建立","已報價","已派工","執行中","待完工","已完成"];
+const STAGES = ["已立案","已報價","已派工","執行中","待完工","已完成"];
 
 // 結案印章（SVG：噪點做舊＋橫式雙框）
 const STAMP_SVG = `<div class="stamp">
@@ -982,7 +982,7 @@ const STAMP_SVG = `<div class="stamp">
 function normalizeStatus(s){
   s = (s||"").trim();
   // 相容舊狀態名稱
-  if(s==="待處理") return "已建立";
+  if(s==="待處理") return "已立案";
   if(s==="處理中") return "執行中";
   return s;
 }
@@ -993,8 +993,8 @@ function stageIndex(s){
 
 function statusClass(s){
   s = normalizeStatus(s);
-  const known = ["已建立","已報價","已派工","執行中","待完工","已完成","已取消"];
-  return "st-" + (known.includes(s) ? s : "已建立");
+  const known = ["已立案","已報價","已派工","執行中","待完工","已完成","已取消"];
+  return "st-" + (known.includes(s) ? s : "已立案");
 }
 
 function renderTimeline(b){
@@ -1007,7 +1007,7 @@ function renderTimeline(b){
   return '<div class="timeline">' + STAGES.map((st,i)=>{
     const cls = i<cur ? "done" : (i===cur ? "done current" : "");
     const info = stages[i] || {};
-    // 已建立階段若無時間，回退使用預約時間
+    // 已立案階段若無時間，回退使用預約時間
     const t = info.time || (i===0 ? b.time : "");
     const timeHtml = t ? '<div class="tl-time">'+esc(t)+'</div>' : "";
     const noteHtml = info.note ? '<div class="tl-note">'+esc(info.note)+'</div>' : "";
@@ -1091,7 +1091,7 @@ async function queryOrders(){
             <span class="result-id">預約編號 : ${esc(b.id)}</span>
             <span class="result-time">　${esc(b.time)}</span>
           </div>
-          <span class="status-chip ${statusClass(b.status)}">${esc(normalizeStatus(b.status)||"已建立")}</span>
+          <span class="status-chip ${statusClass(b.status)}">${esc(normalizeStatus(b.status)||"已立案")}</span>
         </div>
         <dl class="result-body">
           <dt>公司名稱</dt><dd>${esc(b.company)}</dd>
