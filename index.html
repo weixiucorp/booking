@@ -691,10 +691,14 @@ border:2px solid var(--line-dk);cursor:pointer;opacity:.65}
         <input type="text" id="brand" placeholder="例：Keysight、Fluke">
       </div>
     </div>
-    <div class="field-row full">
+    <div class="field-row">
       <div class="field">
         <label>產品型號</label>
         <input type="text" id="model" placeholder="例：3458A">
+      </div>
+      <div class="field">
+        <label>產品序號</label>
+        <input type="text" id="serialno" placeholder="例：2045J00286">
       </div>
     </div>
   </div>
@@ -702,7 +706,7 @@ border:2px solid var(--line-dk);cursor:pointer;opacity:.65}
   <!-- 04 -->
   <div class="card">
     <span class="ghost">04</span>
-    <div class="card-title"><span class="tick"></span><h2>特殊說明</h2><span class="opt">OPTIONAL 選填</span></div>
+    <div class="card-title"><span class="tick"></span><h2>需求說明</h2><span class="opt">OPTIONAL 選填</span></div>
     <div class="field">
       <textarea id="remarks" placeholder="請描述問題、特殊需求或注意事項..."></textarea>
     </div>
@@ -896,6 +900,7 @@ async function submitForm(){
     prodName: document.getElementById("prodname").value.trim(),
     brand:   document.getElementById("brand").value.trim(),
     model:   document.getElementById("model").value.trim(),
+    serialNo: document.getElementById("serialno").value.trim(),
     remarks: document.getElementById("remarks").value.trim(),
     custCode: document.getElementById("custcode").value.trim().toUpperCase(),
   };
@@ -1106,7 +1111,8 @@ async function queryOrders(){
           ${b.prodName ? "<dt>產品名稱</dt><dd>"+esc(b.prodName)+"</dd>" : ""}
           ${b.brand  ? "<dt>產品品牌</dt><dd>"+esc(b.brand)+"</dd>" : ""}
           ${b.model  ? "<dt>產品型號</dt><dd>"+esc(b.model)+"</dd>" : ""}
-          ${b.remarks? "<dt>特殊說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
+          ${b.serialNo ? "<dt>產品序號</dt><dd>"+esc(b.serialNo)+"</dd>" : ""}
+          ${b.remarks? "<dt>需求說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
         </dl>
           ${(b.photos&&b.photos.length)
             ? '<div><img class="cust-photo-main" data-cur="0" src="'+qThumb(b.photos[0])+'" alt="產品照片" onclick="qOpenPhoto(this)">'
@@ -1130,7 +1136,7 @@ async function queryOrders(){
 }
 
 function resetForm(){
-  ["company","contact","phone","email","address","custcode","prodname","brand","model","remarks"].forEach(id=>{
+  ["company","contact","phone","email","address","custcode","prodname","brand","model","serialno","remarks"].forEach(id=>{
     const el=document.getElementById(id);el.value="";el.classList.remove("invalid");
   });
   document.querySelectorAll(".err-msg").forEach(e=>e.style.display="none");
