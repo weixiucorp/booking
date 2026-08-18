@@ -562,6 +562,10 @@ box-shadow:0 2px 8px rgba(16,29,38,.1)}
 .cust-thumbs img{width:34px;height:34px;object-fit:cover;border-radius:6px;
 border:2px solid var(--line-dk);cursor:pointer;opacity:.65}
 .cust-thumbs img.on{border-color:var(--blue);opacity:1}
+.warranty-badge{display:inline-block;font-size:11.5px;font-weight:900;padding:2px 10px;
+border-radius:999px;margin-left:8px;letter-spacing:.05em;vertical-align:1px}
+.warranty-badge.wb-ok{background:#eef8f1;color:#1e7e4e;border:1px solid #9fd4b4}
+.warranty-badge.wb-exp{background:#fdecea;color:#c62828;border:1px solid #f5b7b1}
 .query-empty{
   text-align:center;padding:3rem 1rem;color:var(--muted);
   background:var(--card);border:1.5px dashed var(--line-dk);border-radius:14px;
@@ -1005,6 +1009,23 @@ function stageIndex(s){
   return STAGES.indexOf(normalizeStatus(s));
 }
 
+function warrantyRow(start,end){
+  start=(start||"").trim(); end=(end||"").trim();
+  if(!start && !end) return "";
+  const show=(start||"—")+" ～ "+(end||"—");
+  let badge="";
+  if(end){
+    const today=new Date(); today.setHours(0,0,0,0);
+    const ed=new Date(end.replace(/-/g,"/"));
+    if(!isNaN(ed.getTime())){
+      badge = ed>=today
+        ? ' <span class="warranty-badge wb-ok">保固中</span>'
+        : ' <span class="warranty-badge wb-exp">已過保</span>';
+    }
+  }
+  return "<dt>保固期限</dt><dd>"+esc(show)+badge+"</dd>";
+}
+
 function statusClass(s){
   s = normalizeStatus(s);
   const known = ["已立案","已報價","已派工","執行中","待完工","已完成","已取消"];
@@ -1122,6 +1143,7 @@ async function queryOrders(){
           ${b.model  ? "<dt>產品型號</dt><dd>"+esc(b.model)+"</dd>" : ""}
           ${b.serialNo ? "<dt>產品序號</dt><dd>"+esc(b.serialNo)+"</dd>" : ""}
           ${b.remarks? "<dt>需求說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
+          ${warrantyRow(b.warrantyStart,b.warrantyEnd)}
         </dl>
           ${(b.photos&&b.photos.length)
             ? '<div><img class="cust-photo-main" data-cur="0" src="'+qThumb(b.photos[0])+'" alt="產品照片" onclick="qOpenPhoto(this)">'
