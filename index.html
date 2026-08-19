@@ -562,6 +562,9 @@ box-shadow:0 2px 8px rgba(16,29,38,.1)}
 .cust-thumbs img{width:34px;height:34px;object-fit:cover;border-radius:6px;
 border:2px solid var(--line-dk);cursor:pointer;opacity:.65}
 .cust-thumbs img.on{border-color:var(--blue);opacity:1}
+.eng-chip{display:inline-block;background:#eef4f8;color:var(--blue-deep);border:1px solid #bcdcec;
+border-radius:999px;padding:2px 12px;font-weight:700;font-size:13px}
+.eng-chip .eng-no{font-family:var(--mono);opacity:.7;margin-right:7px}
 .warranty-badge{display:inline-block;font-size:11.5px;font-weight:900;padding:2px 10px;
 border-radius:999px;margin-left:8px;letter-spacing:.05em;vertical-align:1px}
 .warranty-badge.wb-ok{background:#eef8f1;color:#1e7e4e;border:1px solid #9fd4b4}
@@ -1144,6 +1147,7 @@ async function queryOrders(){
           ${b.serialNo ? "<dt>產品序號</dt><dd>"+esc(b.serialNo)+"</dd>" : ""}
           ${b.remarks? "<dt>需求說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
           ${warrantyRow(b.warrantyStart,b.warrantyEnd)}
+          ${b.engNo ? '<dt>負責工程師</dt><dd><span class="eng-chip"><span class="eng-no">'+esc(b.engNo)+'</span>'+esc(b.engMasked||"")+'</span></dd>' : ""}
         </dl>
           ${(b.photos&&b.photos.length)
             ? '<div><img class="cust-photo-main" data-cur="0" src="'+qThumb(b.photos[0])+'" alt="產品照片" onclick="qOpenPhoto(this)">'
