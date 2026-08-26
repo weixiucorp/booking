@@ -1147,7 +1147,7 @@ async function queryOrders(){
           ${b.serialNo ? "<dt>產品序號</dt><dd>"+esc(b.serialNo)+"</dd>" : ""}
           ${b.remarks? "<dt>需求說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
           ${warrantyRow(b.warrantyStart,b.warrantyEnd)}
-          ${b.engNo ? '<dt>負責工程師</dt><dd><span class="eng-chip"><span class="eng-no">'+esc(b.engNo)+'</span>'+esc(b.engMasked||"")+'</span></dd>' : ""}
+          ${b.engNo ? '<dt>負責人員</dt><dd><span class="eng-chip"><span class="eng-no">'+esc(b.engNo)+'</span>'+esc(b.engMasked||"")+'</span></dd>' : ""}
         </dl>
           ${(b.photos&&b.photos.length)
             ? '<div><img class="cust-photo-main" data-cur="0" src="'+qThumb(b.photos[0])+'" alt="產品照片" onclick="qOpenPhoto(this)">'
