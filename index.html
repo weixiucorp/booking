@@ -640,7 +640,7 @@ border-radius:999px;margin-left:8px;letter-spacing:.05em;vertical-align:1px}
     <div class="field-row">
       <div class="field">
         <label>公司名稱 <span class="req">*</span></label>
-        <input type="text" id="company" placeholder="請輸入公司名稱" oninput="trackProgress()">
+        <input type="text" id="company" placeholder="請輸入公司名稱" oninput="trackProgress()" onblur="lookupCode()">
         <span class="err-msg" id="err-company">請填寫公司名稱</span>
       </div>
       <div class="field">
@@ -671,7 +671,8 @@ border-radius:999px;margin-left:8px;letter-spacing:.05em;vertical-align:1px}
     <div class="field-row full">
       <div class="field">
         <label>客戶代碼 <span class="opt" style="font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400;margin-left:4px">OPTIONAL 選填・老客戶請填寫</span></label>
-        <input type="text" id="custcode" placeholder="例：CTW001（新客戶請留空，系統將為您建立）" style="text-transform:uppercase;font-family:var(--mono);letter-spacing:.08em">
+        <input type="text" id="custcode" placeholder="例：CTW001（新客戶請留空，系統將為您建立）" style="text-transform:uppercase;font-family:var(--mono);letter-spacing:.08em" oninput="document.getElementById('hint-custcode').style.display='none'">
+        <span id="hint-custcode" style="display:none;color:var(--ok);font-size:12px;margin-top:4px;font-weight:500">✓ 已為您帶入客戶代碼（如非本公司歡迎修改）</span>
       </div>
     </div>
   </div>
@@ -883,6 +884,23 @@ function trackProgress(){
     .every(id => document.getElementById(id).value.trim() !== "");
   document.getElementById("step-1").classList.toggle("done", basicDone);
   document.getElementById("step-2").classList.toggle("done", selectedService !== "");
+}
+
+async function lookupCode(){
+  const companyEl = document.getElementById("company");
+  const codeEl = document.getElementById("custcode");
+  const hintEl = document.getElementById("hint-custcode");
+  const name = companyEl.value.trim();
+  if(!name || codeEl.value.trim() !== ""){ if(hintEl) hintEl.style.display="none"; return; }
+  try{
+    const url = GAS_URL+"?action=lookupCode&company="+encodeURIComponent(name);
+    const res = await fetch(url);
+    const data = await res.json();
+    if(data.status==="success" && data.code){
+      codeEl.value = data.code;
+      if(hintEl) hintEl.style.display="block";
+    }
+  }catch(e){ /* silent fail, non-critical */ }
 }
 
 function validate(){
