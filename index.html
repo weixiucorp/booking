@@ -1012,6 +1012,23 @@ function stageIndex(s){
   return STAGES.indexOf(normalizeStatus(s));
 }
 
+function dueRow(due, status){
+  due = (due||"").trim();
+  if(!due) return "";
+  const s = normalizeStatus(status);
+  let badge = "";
+  if(s !== "已完成" && s !== "已取消"){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dd = new Date(due.replace(/-/g,"/"));
+    if(!isNaN(dd.getTime())){
+      badge = dd >= today
+        ? ' <span class="warranty-badge wb-ok">如期進行中</span>'
+        : ' <span class="warranty-badge wb-exp">已逾交貨期</span>';
+    }
+  }
+  return "<dt>交貨期</dt><dd>"+esc(due)+badge+"</dd>";
+}
+
 function warrantyRow(start,end){
   start=(start||"").trim(); end=(end||"").trim();
   if(!start && !end) return "";
@@ -1146,6 +1163,7 @@ async function queryOrders(){
           ${b.model  ? "<dt>產品型號</dt><dd>"+esc(b.model)+"</dd>" : ""}
           ${b.serialNo ? "<dt>產品序號</dt><dd>"+esc(b.serialNo)+"</dd>" : ""}
           ${b.remarks? "<dt>需求說明</dt><dd>"+esc(b.remarks)+"</dd>" : ""}
+          ${dueRow(b.dueDate,b.status)}
           ${warrantyRow(b.warrantyStart,b.warrantyEnd)}
           ${b.engNo ? '<dt>負責人員</dt><dd><span class="eng-chip"><span class="eng-no">'+esc(b.engNo)+'</span>'+esc(b.engMasked||"")+'</span></dd>' : ""}
         </dl>
